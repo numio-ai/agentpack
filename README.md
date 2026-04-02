@@ -1,50 +1,41 @@
-# agentpack
+# Babelport
 
-A tool to manage AI coding agents configuration.
+Babelport translates [GearLoop](https://github.com/vkroz/gearloop) plugin artifacts into tool-specific configs for Cursor, Kiro, and GitHub Copilot.
 
-## Why agentpack
+GearLoop defines the canonical format. Write rules and skills once in `.claude/` — Babelport converts them to whatever your team uses.
 
-The primary goal is consistent AI coding-agent configuration management across organizations, teams, projects, and repositories.
+## Why Babelport
 
-`agentpack` helps centralize and distribute shared rules, while still allowing repo-level customization.
+Teams adopting AI coding tools shouldn't rewrite configuration for each platform. Babelport treats GearLoop's `.claude/` format as the source of truth and outputs tool-specific configs, keeping rules consistent across organizations, teams, projects, and repositories.
 
-Multi-tool vendor-neutral configuration is a secondary benefit:
-- Write canonical rules and skills once in `.agentpack/`
-- Compile to tool-specific outputs for Claude Code and Cursor
+## Prerequisites
+
+Babelport requires an existing `.claude/` directory populated by GearLoop. Run GearLoop first — Babelport has nothing to translate without it.
 
 ## Installation
-
 ```bash
-uv tool install git+https://github.com/numio-ai/agentpack
+uv tool install git+https://github.com/vkroz/babelport
 ```
 
-## Quick start
-
+## Usage
 ```bash
-cd my-project
-agentpack init       # creates .agentpack/ with starter config
-# edit rules in .agentpack/rules/
-agentpack generate   # produces tool-specific output files
+babelport translate --target cursor
+babelport translate --target kiro
+babelport translate --target copilot
 ```
 
-## Core commands
+## Output
 
-- `agentpack init` - Bootstrap `.agentpack/` in the current repo
-- `agentpack generate` - Compile canonical artifacts into tool-specific configs
-- `agentpack sync [<remote>]` - Pull shared rules from configured remotes or a git URL
+| Target | Output path |
+|---|---|
+| `cursor` | `.cursor/rules/*.md` |
+| `kiro` | `AGENTS.md` |
+| `copilot` | `.github/copilot-instructions.md` |
 
 ## Hierarchical inheritance
 
-Hierarchical inheritance is a core concept in `agentpack`: rules are designed to compose across levels such as global -> org -> project -> repo -> user.
+Rules compose across levels: global → org → project → repo → user. Each level overrides or extends the one above without breaking the chain. Babelport preserves this hierarchy in all output formats.
 
-## Generated output
+## Further reading
 
-Given `agents: [claude, cursor]`:
-- `.agentpack/rules/CLAUDE.md` -> `CLAUDE.md` (root) and `AGENTS.md` (root, cursor-only)
-- `.agentpack/rules/*.md` -> `.claude/rules/*.md` and `.cursor/rules/*.md`
-- `.agentpack/skills/<name>/skill.md` -> `.claude/skills/<name>.md` and `.cursor/rules/<name>.md`
-
-## Miscellaneous
-
-For more details, see `docs/user-guide.md`.
-See also the [examples at agentpack-depot](https://github.com/numio-ai/agentpack-depot).
+See `docs/user-guide.md` for full configuration reference.
